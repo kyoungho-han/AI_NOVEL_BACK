@@ -47,8 +47,6 @@ public class AuthorController {
     @PostMapping(value = "/join", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity saveUser(@RequestBody User user) {
         try {
-            System.out.println("실행함");
-            System.out.println(user);
             return new ResponseEntity<>(authorService.saveUser(user), HttpStatus.OK);
         } catch (SameUsernameException e) {
             return new ResponseEntity<>(StatusDTO.builder().status(e.getMessage()).build(), HttpStatus.OK);
