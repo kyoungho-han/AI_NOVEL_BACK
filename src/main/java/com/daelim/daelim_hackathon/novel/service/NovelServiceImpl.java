@@ -190,6 +190,9 @@ public class NovelServiceImpl implements NovelService{
 
         Novel novel = novelRepository.getReferenceById(novelId);
         novel.changeTitle(modifyDTO.getTitle());
+        System.out.println("이거야");
+        System.out.println(modifyDTO);
+        novel.changeIsPublic(modifyDTO.getIsPublic());
         novelRepository.save(novel);
         return StatusDTO.builder().status("success").build();
     }
@@ -241,7 +244,7 @@ public class NovelServiceImpl implements NovelService{
     @Override
     public void visible(Long novelId) {
         Novel novel = novelRepository.getReferenceById(novelId);
-        novel.changeIsPublic();
+        novel.changeIsPublic(true);
         novelRepository.save(novel);
     }
 
