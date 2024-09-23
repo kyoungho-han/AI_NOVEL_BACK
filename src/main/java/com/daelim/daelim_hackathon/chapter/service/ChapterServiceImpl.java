@@ -42,7 +42,6 @@ public class ChapterServiceImpl implements ChapterService{
     public ChapterDTO saveChapter(ChapterDTO chapterDTO) {
         try {
             Novel novel = novelRepository.findById(chapterDTO.getNovelId()).get();
-            System.out.println(chapterDTO);
             return entityToDTO(chapterRepository.save(dtoToEntity(chapterDTO)), novel);
         } catch(Exception e) {
             throw e;

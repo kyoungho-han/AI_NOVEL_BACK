@@ -120,8 +120,6 @@ public class NovelController {
     @PutMapping(value= "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity modify(@PathVariable(value = "id") String id, @RequestBody NovelModifyDTO dto) {
         try {
-            System.out.println("이거임");
-            System.out.println(dto);
             return new ResponseEntity<>(novelService.updateNovel(Long.parseLong(id), dto), HttpStatus.OK);
         }catch (Exception e) {
             e.printStackTrace();
