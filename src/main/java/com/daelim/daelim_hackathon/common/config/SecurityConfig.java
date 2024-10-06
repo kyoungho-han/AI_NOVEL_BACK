@@ -73,8 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/authors/join/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/novels",
                         "/novels/drawing/**").permitAll()
-                .antMatchers("/novels/**").hasAuthority("ROLE_USER")
-                .antMatchers("/chapters/**").hasAuthority("ROLE_USER")
+                .antMatchers("/novels/**").permitAll()
+                .antMatchers("/chapters/**").permitAll()
 //                .antMatchers(HttpMethod.GET, "/authors/user/**").hasAuthority("ROLE_USER")
 //                .antMatchers(HttpMethod.POST, "/authors/user/save/**").hasAuthority("ROLE_MANAGER")
                 // 인증(authenticated)되야만 접근 가능 antMatchers 로 지정한 엔드포인트 외에

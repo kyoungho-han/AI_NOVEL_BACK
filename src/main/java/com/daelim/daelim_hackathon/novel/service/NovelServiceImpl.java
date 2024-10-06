@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -242,7 +243,6 @@ public class NovelServiceImpl implements NovelService{
     @Override
     public void visible(Long novelId) {
         Novel novel = novelRepository.getReferenceById(novelId);
-        novel.changeIsPublic(true);
         novelRepository.save(novel);
     }
 
@@ -258,7 +258,9 @@ public class NovelServiceImpl implements NovelService{
 
     @Override
     public String getURL(Long novelId) {
-        return novelDrawingRepository.findByNovel_Id(novelId).getUuid();
+        NovelDrawing drawing = novelDrawingRepository.findByNovel_Id(novelId);
+
+        return drawing.getUuid();
     }
 
 
