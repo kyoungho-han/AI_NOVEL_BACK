@@ -210,7 +210,8 @@ public class NovelController {
             );
         } catch(Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            // 소설 표지 없을 시 조회 때 에러 떠서 OK 처리 (상태만 OK고 null 값을 가져옴)
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
         }
     }
 
@@ -236,18 +237,21 @@ public class NovelController {
     }
 
     @GetMapping(value = "/download/{id}")
-    public ResponseEntity getURL(@PathVariable("id") String id) {
-        try {
+    public ResponseEntity<StringDTO> getURL(@PathVariable("id") String id) {
+
+        String imageUrl = novelService.getURL(Long.parseLong(id));
+
+        // 이미지 URL이 null인 경우
+        if (imageUrl == null || imageUrl.isEmpty()) {
             return new ResponseEntity<>(
-                    StringDTO.builder().string(
-                                    novelService.getURL(
-                                            Long.parseLong(id)))
-                            .build(),
-                    HttpStatus.OK
+                    StringDTO.builder().string(null).build(),
+                    HttpStatus.OK // 성공 상태
             );
-        } catch(Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+        // 정상적으로 URL을 가져온 경우
+        return new ResponseEntity<>(
+                StringDTO.builder().string(imageUrl).build(),
+                HttpStatus.OK
+        );
     }
 }
