@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -21,6 +22,18 @@ public class NovelDrawing {
 
     @Column(length = 1000)
     private String uuid;
+
+    @Column(length = 100)
+    private String file_path;
+
+    @Column(length = 100)
+    private String file_name;
+
+    @Column(length = 100)
+    private String file_extension;
+
+    @Column(name = "create_date")
+    private Date newDate;
 
     @OneToOne
     private Novel novel;

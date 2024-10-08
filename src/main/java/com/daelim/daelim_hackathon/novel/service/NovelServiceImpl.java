@@ -5,13 +5,10 @@ import com.daelim.daelim_hackathon.author.repo.UserRepository;
 import com.daelim.daelim_hackathon.drawing.domain.NovelDrawing;
 import com.daelim.daelim_hackathon.drawing.repo.NovelDrawingRepository;
 import com.daelim.daelim_hackathon.novel.domain.UserNovel;
-import com.daelim.daelim_hackathon.novel.dto.NovelPageRequestDTO;
+import com.daelim.daelim_hackathon.novel.dto.*;
 import com.daelim.daelim_hackathon.common.dto.PageResultDTO;
 import com.daelim.daelim_hackathon.novel.domain.Novel;
-import com.daelim.daelim_hackathon.novel.dto.NovelModifyDTO;
-import com.daelim.daelim_hackathon.novel.dto.NovelDTO;
 import com.daelim.daelim_hackathon.common.dto.StatusDTO;
-import com.daelim.daelim_hackathon.novel.dto.SearchPageRequestDTO;
 import com.daelim.daelim_hackathon.novel.exception.SearchException;
 import com.daelim.daelim_hackathon.novel.repo.NovelRepository;
 import com.daelim.daelim_hackathon.novel.repo.UserNovelRepository;
@@ -247,13 +244,16 @@ public class NovelServiceImpl implements NovelService{
     }
 
     @Override
-    public String uploadURL(String url, Long novelId) {
+    public String uploadURL(NovelDrawingDTO dto) {
         novelDrawingRepository.save(NovelDrawing.builder()
-                .novel(novelRepository.getReferenceById(novelId))
-                .uuid(url)
+                .novel(novelRepository.getReferenceById(dto.getNovelId()))
+                .uuid(dto.getUuid())
+                .file_extension(dto.getFileExtension())
+                .file_name(dto.getFileName())
+                .file_path(dto.getFilePath())
                 .build()
         );
-        return url;
+        return dto.getFilePath();
     }
 
     @Override

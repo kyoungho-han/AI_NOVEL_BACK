@@ -6,19 +6,18 @@ import com.daelim.daelim_hackathon.drawing.dto.FileNameDTO;
 import com.daelim.daelim_hackathon.drawing.dto.StringDTO;
 import com.daelim.daelim_hackathon.drawing.service.AwsS3Service;
 import com.daelim.daelim_hackathon.drawing.service.PapagoService;
-import com.daelim.daelim_hackathon.novel.dto.NovelModifyDTO;
-import com.daelim.daelim_hackathon.novel.dto.NovelDTO;
-import com.daelim.daelim_hackathon.novel.dto.NovelPageRequestDTO;
-import com.daelim.daelim_hackathon.novel.dto.SearchPageRequestDTO;
+import com.daelim.daelim_hackathon.novel.dto.*;
 import com.daelim.daelim_hackathon.novel.service.NovelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 @Log4j2
@@ -30,6 +29,10 @@ public class NovelController {
     private final AwsS3Service awsS3Service;
     private final PapagoService papagoService;
     private final ChapterService chapterService;
+
+    @Value("UPLOAD_DIR")
+    private String uploadDir;
+
     /**
      * 한글 영어로 번역
      * 
@@ -212,16 +215,18 @@ public class NovelController {
     }
 
     @PostMapping(value = "/upload/{id}")
-    public ResponseEntity uploadURL(@RequestBody StringDTO stringDTO,
+    public ResponseEntity uploadURL(@RequestParam("file") MultipartFile file,
                                  @PathVariable("id") String id) {
         try {
             novelService.visible(Long.parseLong(id));
+            String fileName = "novel_" + id + ".png";
+            NovelDrawingDTO dto = new NovelDrawingDTO();
+            dto.setCreateDate(new Date());
+            dto.setFileName(fileName);
+            dto.setFilePath(uploadDir + id + "/" + fileName);
             return new ResponseEntity<>(
                     StringDTO.builder().string(
-                            novelService.uploadURL(
-                                    stringDTO.getString(),
-                                    Long.parseLong(id)))
-                            .build(),
+                            novelService.uploadURL(dto)),
                     HttpStatus.OK
             );
         } catch(Exception e) {
