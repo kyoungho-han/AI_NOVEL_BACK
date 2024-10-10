@@ -17,6 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +34,7 @@ public class NovelController {
     private final PapagoService papagoService;
     private final ChapterService chapterService;
 
-    @Value("UPLOAD_DIR")
+    @Value("${UPLOAD_DIR}")
     private String uploadDir;
 
     /**
@@ -224,7 +228,11 @@ public class NovelController {
             NovelDrawingDTO dto = new NovelDrawingDTO();
             dto.setCreateDate(new Date());
             dto.setFileName(fileName);
+            Path path = Paths.get(uploadDir + id);
+            Files.createDirectories(path);
             dto.setFilePath(uploadDir + id + "/" + fileName);
+            log.info(dto.getFilePath());
+            file.transferTo(new File(dto.getFilePath()));
             return new ResponseEntity<>(
                     StringDTO.builder().string(
                             novelService.uploadURL(dto)),
