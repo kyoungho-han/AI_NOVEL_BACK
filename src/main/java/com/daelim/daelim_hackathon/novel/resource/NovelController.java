@@ -221,13 +221,18 @@ public class NovelController {
 
     @PostMapping(value = "/upload/{id}")
     public ResponseEntity uploadURL(@RequestParam("file") MultipartFile file,
-                                 @PathVariable("id") String id) {
+                                    @RequestParam("uuid") String uuid,
+                                    @PathVariable("id") String id) {
         try {
-            novelService.visible(Long.parseLong(id));
+            Long novelId = Long.parseLong(id);
+            novelService.visible(novelId);
+
             String fileName = "novel_" + id + ".png";
             NovelDrawingDTO dto = new NovelDrawingDTO();
+            dto.setNovelId(novelId);
             dto.setCreateDate(new Date());
             dto.setFileName(fileName);
+            dto.setUuid(uuid);
             Path path = Paths.get(uploadDir + id);
             Files.createDirectories(path);
             dto.setFilePath(uploadDir + id + "/" + fileName);
