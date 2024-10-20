@@ -5,6 +5,7 @@ import com.daelim.daelim_hackathon.novel.domain.Novel;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -23,6 +24,18 @@ public class ChapterDrawing {
 
     @ManyToOne
     private Chapter chapter;
+
+    @Column(length = 100)
+    private String file_path;
+
+    @Column(length = 100)
+    private String file_name;
+
+    @Column(length = 100)
+    private String file_extension;
+
+    @Column(name = "create_date")
+    private Date newDate;
 
     @ManyToOne
     private Novel novel;

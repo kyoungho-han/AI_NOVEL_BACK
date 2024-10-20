@@ -1,5 +1,6 @@
 package com.daelim.daelim_hackathon.novel.resource;
 
+import org.springframework.core.io.Resource;
 import com.daelim.daelim_hackathon.chapter.service.ChapterService;
 import com.daelim.daelim_hackathon.common.dto.NameDTO;
 import com.daelim.daelim_hackathon.drawing.dto.FileNameDTO;
@@ -11,6 +12,7 @@ import com.daelim.daelim_hackathon.novel.service.NovelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @RestController
@@ -238,11 +241,7 @@ public class NovelController {
             dto.setFilePath(uploadDir + id + "/" + fileName);
             log.info(dto.getFilePath());
             file.transferTo(new File(dto.getFilePath()));
-            return new ResponseEntity<>(
-                    StringDTO.builder().string(
-                            novelService.uploadURL(dto)),
-                    HttpStatus.OK
-            );
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch(Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -250,21 +249,37 @@ public class NovelController {
     }
 
     @GetMapping(value = "/download/{id}")
-    public ResponseEntity<StringDTO> getURL(@PathVariable("id") String id) {
+    public ResponseEntity<Resource> getURL(@PathVariable("id") String id) {
+        try {
+            // 소설 ID에 해당하는 폴더 경로
+            Path directoryPath = Paths.get(uploadDir + id);
+            if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
+                // 폴더가 존재하지 않으면 404 반환
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
 
-        String imageUrl = novelService.getURL(Long.parseLong(id));
+            // 폴더 내의 파일을 검색
+            Optional<Path> imageFile = Files.list(directoryPath)
+                    .filter(path -> path.toString().endsWith(".png")) // PNG 파일만 필터링
+                    .findFirst();
 
-        // 이미지 URL이 null인 경우
-        if (imageUrl == null || imageUrl.isEmpty()) {
-            return new ResponseEntity<>(
-                    StringDTO.builder().string(null).build(),
-                    HttpStatus.OK // 성공 상태
-            );
+            // 파일이 존재하는지 확인
+            if (imageFile.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            // 파일을 읽어 Resource로 변환
+            Path filePath = imageFile.get();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            // 정상적으로 Resource를 반환
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(resource);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        // 정상적으로 URL을 가져온 경우
-        return new ResponseEntity<>(
-                StringDTO.builder().string(imageUrl).build(),
-                HttpStatus.OK
-        );
     }
 }

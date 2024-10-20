@@ -1,10 +1,7 @@
 package com.daelim.daelim_hackathon.chapter.service;
 
 import com.daelim.daelim_hackathon.chapter.domain.Chapter;
-import com.daelim.daelim_hackathon.chapter.dto.ChapterDTO;
-import com.daelim.daelim_hackathon.chapter.dto.ChapterModifyDTO;
-import com.daelim.daelim_hackathon.chapter.dto.ChapterPageRequestDTO;
-import com.daelim.daelim_hackathon.chapter.dto.NoWritingDTO;
+import com.daelim.daelim_hackathon.chapter.dto.*;
 import com.daelim.daelim_hackathon.chapter.exception.ChapterException;
 import com.daelim.daelim_hackathon.chapter.exception.LastChapterException;
 import com.daelim.daelim_hackathon.chapter.repo.ChapterRepository;
@@ -148,24 +145,26 @@ public class ChapterServiceImpl implements ChapterService{
 
 
     @Override
-    public String uploadURL(String url, Long chapterId) {
+    public String uploadURL(ChapterDrawingDTO dto) {
         chapterDrawingRepository.save(ChapterDrawing.builder()
-                .chapter(chapterRepository.getReferenceById(chapterId))
-                .novel(chapterRepository.getReferenceById(chapterId).getNovel())
-                .uuid(url)
+                .chapter(chapterRepository.getReferenceById(dto.getChapterId()))
+                .uuid(dto.getUuid())
+                .file_extension(dto.getFileExtension())
+                .file_name(dto.getFileName())
+                .file_path(dto.getFilePath())
                 .build()
         );
-        return url;
+        return dto.getFilePath();
     }
 
     @Override
     @Transactional
-    public String updateURL(String url, Long chapterId) {
-        ChapterDrawing existingChapterDrawing = chapterDrawingRepository.findByChapter_Id(chapterId);
-        existingChapterDrawing.setUuid(url);
+    public String updateURL(ChapterDrawingDTO dto) {
+        ChapterDrawing existingChapterDrawing = chapterDrawingRepository.findByChapter_Id(dto.getChapterId());
+        existingChapterDrawing.setUuid(dto.getUuid());
         chapterDrawingRepository.save(existingChapterDrawing);
 
-        return url;
+        return dto.getUuid();
     }
 
     @Override
